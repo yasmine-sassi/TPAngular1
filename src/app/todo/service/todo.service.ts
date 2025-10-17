@@ -1,8 +1,6 @@
-import { Injectable, inject } from '@angular/core';
-import { Todo } from '../model/todo';
+import { Injectable, inject, signal } from '@angular/core';
+import { Todo, TodoStatus } from '../model/todo';
 import { LoggerService } from '../../services/logger.service';
-
-let n = 1;
 
 @Injectable({
   providedIn: 'root',
@@ -10,50 +8,50 @@ let n = 1;
 export class TodoService {
   private loggerService = inject(LoggerService);
 
-  private todos: Todo[] = [];
+  // Utiliser un signal pour la liste des todos
+  private todos = signal<Todo[]>([]);
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
   constructor() {}
 
   /**
-   * elle retourne la liste des todos
-   *
-   * @returns Todo[]
+   * Retourne la liste des todos (en lecture seule)
    */
-  getTodos(): Todo[] {
-    return this.todos;
+  getTodos() {
+    return this.todos.asReadonly();
   }
 
   /**
-   *Elle permet d'ajouter un todo
-   *
-   * @param todo: Todo
-   *
+   * Ajouter un todo
    */
   addTodo(todo: Todo): void {
-    this.todos.push(todo);
+    this.todos.update(currentTodos => [...currentTodos, todo]);
   }
 
   /**
-   * Delete le todo s'il existe
-   *
-   * @param todo: Todo
-   * @returns boolean
+   * Supprimer un todo
    */
   deleteTodo(todo: Todo): boolean {
-    const index = this.todos.indexOf(todo);
-    if (index > -1) {
-      this.todos.splice(index, 1);
-      return true;
-    }
-    return false;
+    this.todos.update(currentTodos => 
+      currentTodos.filter(t => t.id !== todo.id)
+    );
+    return true;
+  }
+
+  /**
+   * Changer le statut d'un todo
+   */
+  updateTodoStatus(todoId: number, newStatus: TodoStatus): void {
+    this.todos.update(currentTodos =>
+      currentTodos.map(todo =>
+        todo.id === todoId ? { ...todo, status: newStatus } : todo
+      )
+    );
   }
 
   /**
    * Logger la liste des todos
    */
   logTodos() {
-    this.loggerService.logger(this.todos);
+    this.loggerService.logger(this.todos());
   }
 }
