@@ -3,15 +3,17 @@ import { Cv } from "../model/cv";
 import { LoggerService } from "../../services/logger.service";
 import { ToastrService } from "ngx-toastr";
 import { CvService } from "../services/cv.service";
+import { Observable, of } from "rxjs";
+import { catchError } from "rxjs/operators";
+
 @Component({
   selector: "app-cv",
   templateUrl: "./cv.component.html",
   styleUrls: ["./cv.component.css"],
 })
 export class CvComponent {
-  cvs: Cv[] = [];
-  selectedCv: Cv | null = null;
-  /*   selectedCv: Cv | null = null; */
+  cvs$: Observable<Cv[]>;            
+  selectedCv$: Observable<Cv | null>; 
   date = new Date();
 
   constructor(
@@ -19,19 +21,26 @@ export class CvComponent {
     private toastr: ToastrService,
     private cvService: CvService
   ) {
-    this.cvService.getCvs().subscribe({
-      next: (cvs) => {
-        this.cvs = cvs;
-      },
-      error: () => {
-        this.cvs = this.cvService.getFakeCvs();
+    // Use async pipe in template instead of subscribe
+    this.cvs$ = this.cvService.getCvs().pipe(
+      catchError((error) => {
         this.toastr.error(`
-          Attention!! Les données sont fictives, problème avec le serveur.
-          Veuillez contacter l'admin.`);
-      },
-    });
+          Attention !! Les données sont fictives, problème avec le serveur.
+          Veuillez contacter l'admin.
+        `);
+        return of(this.cvService.getFakeCvs()); // fallback data
+      })
+    );
+
+    this.selectedCv$ = this.cvService.selectCv$;
+
+    // Logs / info
     this.logger.logger("je suis le cvComponent");
     this.toastr.info("Bienvenu dans notre CvTech");
-    this.cvService.selectCv$.subscribe((cv) => (this.selectedCv = cv));
+  }
+
+  // Called when a CV is selected from ListComponent
+  selectCv(cv: Cv) {
+    this.cvService.selectCv(cv);
   }
 }
