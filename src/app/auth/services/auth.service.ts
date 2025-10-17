@@ -3,7 +3,7 @@ import { CredentialsDto } from '../dto/credentials.dto';
 import { LoginResponseDto } from '../dto/login-response.dto';
 import { HttpClient } from '@angular/common/http';
 import { API } from '../../../config/api.config';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -17,8 +17,15 @@ export class AuthService {
   constructor() {}
 
   login(credentials: CredentialsDto): Observable<LoginResponseDto> {
-    return this.http.post<LoginResponseDto>(API.login, credentials);
-  }
+    // DEV: return a fake token locally so you can log in without backend
+    const fakeResponse: LoginResponseDto = {
+      id: 'dev-token',
+      ttl: 1209600,
+      created: new Date(),
+      userId: 1,
+    };
+    return of(fakeResponse); // import { of } from 'rxjs';
+  }  
 
   isAuthenticated(): boolean {
     return !!localStorage.getItem('token');
