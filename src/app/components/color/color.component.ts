@@ -30,11 +30,13 @@ export class ColorComponent implements OnInit {
   }
 
   // Method to change color
-  changeColor(newColor: string) {
+   changeColor(newColor: string) {
     this.divColorSignal.set(newColor);
-    this.inputTextColorSignal.set(newColor);
-
-    // Apply color to the input element directly if needed
-    this.inputTextColor = this.inputTextColorSignal(); // Update the property
+    // Reset input text color by setting the default color for appRainbowWriting
+    const inputField = document.querySelector('input') as HTMLInputElement;
+    if (inputField) {
+      inputField.style.color = newColor; // Apply the reset color
+    }
   }
-}
+  }
+
