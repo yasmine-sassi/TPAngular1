@@ -1,26 +1,36 @@
 import { Directive, HostBinding, HostListener } from '@angular/core';
+import { fromEvent } from 'rxjs';  // Import RxJS utilities
+import { map } from 'rxjs/operators';  // Use operators like map
 
 @Directive({
   selector: '[appRainbowWriting]'
 })
 export class RainbowWritingDirective {
-  // Array of colors to choose from
-  private colors: string[] = ['red', 'blue', 'green', 'purple', 'orange', 'yellow'];
+  // Define an array of colors
+  private colors: string[] = ['red', 'blue', 'green', 'yellow', 'orange', 'purple', 'pink', 'cyan'];
 
-  // HostBinding to change the color and border color of the host element (the input)
-  @HostBinding('style.color') textColor: string = 'black';
-  @HostBinding('style.borderColor') borderColor: string = 'black';
+  // Host bindings for text color and border color
+  @HostBinding('style.color') color = 'black';
+  @HostBinding('style.borderColor') borderColor = 'black';
 
   constructor() {}
 
-  // Listen to the keyup event on the host element (input)
-  @HostListener('keyup', ['$event'])
-  onKeyUp(event: KeyboardEvent): void {
-    // Pick a random color from the colors array
-    const randomColor = this.colors[Math.floor(Math.random() * this.colors.length)];
+  // Function to return a random color from the color array
+  private getRandomColor(): string {
+    const randomIndex = Math.floor(Math.random() * this.colors.length);
+    return this.colors[randomIndex];
+  }
 
-    // Apply the color to the text and border of the input
-    this.textColor = randomColor;
-    this.borderColor = randomColor;
+  // Listen for the keyup event using RxJS
+  @HostListener('keyup', ['$event'])
+  onKeyUp(event: KeyboardEvent) {
+    // Create an observable for the keyup event
+    fromEvent(event.target as HTMLElement, 'keyup').pipe(
+      map(() => this.getRandomColor())  // Map the event to a random color
+    ).subscribe((color: string) => {
+      // Apply the random color to text and border
+      this.color = color;
+      this.borderColor = color;
+    });
   }
 }
