@@ -1,6 +1,8 @@
 import { Injectable, signal } from '@angular/core';
 import { CredentialsDto } from '../dto/credentials.dto';
 import { Observable, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -10,41 +12,30 @@ export class AuthService {
   user = signal<{ id: string; email: string } | null>(null);
   private token: string | null = null;
 
-  // Mock user for testing
-  private readonly MOCK_USER = {
-    email: 'test@test.com',
-    password: 'test123'
-  };
-
-  constructor() {
+  constructor(private http: HttpClient) {
     this.loadUserFromStorage();
   }
 
   login(credentials: CredentialsDto): Observable<any> {
-    // Mock authentication logic
-    if (credentials.email === this.MOCK_USER.email && 
-        credentials.password === this.MOCK_USER.password) {
-      const mockResponse = {
-        id: 'mock-token-123',
-        userId: '1'
-      };
-      
-      this.token = mockResponse.id;
-      this.isAuthenticated.set(true);
-      this.user.set({ id: String(mockResponse.userId), email: credentials.email });
-      localStorage.setItem('token', mockResponse.id);
-      localStorage.setItem('user', JSON.stringify({ 
-        id: String(mockResponse.userId), 
-        email: credentials.email 
-      }));
-
-      return of(mockResponse);
-    }
-    
-    // Return error for invalid credentials
-    return new Observable(subscriber => {
-      subscriber.error({ error: 'Invalid credentials' });
-    });
+    // Load users from JSON and check credentials
+    return this.http.get<any[]>('assets/users.json').pipe(
+      map(users => {
+        const found = users.find(u => u.email === credentials.email && u.password === credentials.password);
+        if (found) {
+          const mockResponse = {
+            id: 'mock-token-' + found.id,
+            userId: found.id
+          };
+          this.token = mockResponse.id;
+          this.isAuthenticated.set(true);
+          this.user.set({ id: String(found.id), email: found.email });
+          localStorage.setItem('token', mockResponse.id);
+          localStorage.setItem('user', JSON.stringify({ id: String(found.id), email: found.email }));
+          return mockResponse;
+        }
+        throw { error: 'Invalid credentials' };
+      })
+    );
   }
 
   logout() {
