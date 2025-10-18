@@ -1,4 +1,4 @@
-import { Injectable, inject } from "@angular/core";
+import { Injectable, inject, signal } from "@angular/core";
 import { Cv } from "../model/cv";
 import { Observable, Subject } from "rxjs";
 import { HttpClient, HttpParams } from "@angular/common/http";
@@ -12,13 +12,10 @@ export class CvService {
 
   private cvs: Cv[] = [];
   /**
-   * Le subject permettant de créer le flux des cvs sélectionnés
+   * Le signal pour le cv sélectionné
    */
-  #selectCvSuject$ = new Subject<Cv>();
-  /**
-   * Le flux des cvs sélectionnés
-   */
-  selectCv$ = this.#selectCvSuject$.asObservable();
+  selectedCv  = signal<Cv | null>(null);
+
 
   /** Inserted by Angular inject() migration for backwards compatibility */
   constructor(...args: unknown[]);
@@ -134,6 +131,6 @@ export class CvService {
    * @param cv : Le cv à ajouter dans le flux des cvs sélectionnés
    */
   selectCv(cv: Cv) {
-    this.#selectCvSuject$.next(cv);
+    this.selectedCv.set(cv);
   }
 }
