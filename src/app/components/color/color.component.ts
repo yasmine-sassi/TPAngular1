@@ -1,31 +1,22 @@
-import { Component, Input, OnInit, inject } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
+import { Component, Input, OnInit } from "@angular/core";
+import { signal } from '@angular/core';  // Import signal for reactive state management
+import { RainbowWritingDirective } from '../../rainbow-writing.directive';  // Import the directive
 
 @Component({
-    selector: "app-color",
-    templateUrl: "./color.component.html",
-    styleUrls: ["./color.component.css"],
-    standalone: true,
+  selector: "app-color",
+  standalone: true,  // This makes the component standalone
+  imports: [RainbowWritingDirective],  // Import the directive here
+  templateUrl: "./color.component.html",
+  styleUrls: ["./color.component.css"],
 })
 export class ColorComponent implements OnInit {
-  private activatedRoute = inject(ActivatedRoute);
-
   @Input() defaultColor = "red";
 
-  /**
-   *
-   * The color representing the Div
-   */
-  divColor = "";
+  // Use signal for reactive color management
+  divColorSignal = signal(this.defaultColor);  // Signal for div color
+  inputTextColorSignal = signal(this.defaultColor);  // Signal for input text color
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
-
-  /**
-   * It change the div backgound color
-   *
-   * @param newColor: string
-   */
+  inputTextColor = this.inputTextColorSignal();  // A normal property for template binding
 
   constructor() {
     console.log("In constructor", this.defaultColor);
@@ -33,10 +24,19 @@ export class ColorComponent implements OnInit {
 
   ngOnInit(): void {
     console.log("In ngOnInit", this.defaultColor);
-    this.divColor = this.defaultColor;
+    // Initialize signals
+    this.divColorSignal.set(this.defaultColor);
+    this.inputTextColorSignal.set(this.defaultColor);
   }
 
-  changeColor(newColor: string) {
-    this.divColor = newColor;
+  // Method to change color
+   changeColor(newColor: string) {
+    this.divColorSignal.set(newColor);
+    // Reset input text color by setting the default color for appRainbowWriting
+    const inputField = document.querySelector('input') as HTMLInputElement;
+    if (inputField) {
+      inputField.style.color = newColor; // Apply the reset color
+    }
   }
-}
+  }
+
