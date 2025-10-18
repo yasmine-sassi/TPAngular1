@@ -1,0 +1,55 @@
+<div class="ttc-card">
+  <h2>TTC Calculator</h2>
+
+  <div class="ttc-inputs">
+    <div class="ttc-input-group">
+      <input
+        type="number"
+        [value]="price()"
+        (input)="updatePrice($event)"
+        placeholder="Prix HT"
+      />
+      <label>Prix HT</label>
+    </div>
+
+    <div class="ttc-input-group">
+      <input
+        type="number"
+        [value]="quantity()"
+        (input)="updateQuantity($event)"
+        placeholder="Quantité"
+      />
+      <label>Quantité</label>
+    </div>
+
+    <div class="ttc-input-group">
+      <input
+        type="number"
+        [value]="tva()"
+        (input)="updateTva($event)"
+        placeholder="TVA"
+      />
+      <label>TVA</label>
+    </div>
+  </div>
+
+  <div class="ttc-results">
+    <div class="result-box unit">
+      Prix unitaire TTC :
+      {{ price() * (1 + tva() / 100) | currency : "USD" : "symbol" : "1.2-2" }}
+    </div>
+
+    <div class="result-box total">
+      Prix total TTC :
+      {{ totalTTC() | currency : "USD" : "symbol" : "1.2-2" }}
+    </div>
+
+    <div class="result-box discount">
+      Discount :
+      {{
+        discount() * price() * quantity()
+          | currency : "USD" : "symbol" : "1.2-2"
+      }}
+    </div>
+  </div>
+</div>
