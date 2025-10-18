@@ -20,10 +20,13 @@ export class NavbarComponent {
   private router = inject(Router);
   private toastr = inject(ToastrService);
 
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
+  get isAuthenticated() {
+    return this.authService.isAuthenticated();
+  }
 
-  constructor() {}
+  get user() {
+    return this.authService.user();
+  }
 
   logout() {
     this.authService.logout();
