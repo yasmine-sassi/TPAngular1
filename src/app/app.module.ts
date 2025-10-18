@@ -6,7 +6,7 @@ import {
   provideHttpClient,
   withInterceptorsFromDi,
 } from "@angular/common/http";
-
+import { RainbowWritingDirective } from './rainbow-writing.directive';  // Import the directive
 import { ToastrModule } from "ngx-toastr";
 
 import { AppComponent } from "./app.component";
@@ -90,6 +90,7 @@ import { SliderComponent } from "./rxjs/slider/slider.component";
     RhComponent,
     UserListComponent,
     ProductsComponent,
+    RainbowWritingDirective,  // Declare the directive
   ],
   bootstrap: [AppComponent],
   imports: [
