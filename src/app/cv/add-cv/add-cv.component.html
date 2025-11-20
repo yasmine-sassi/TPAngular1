@@ -10,7 +10,8 @@
   </div>
   Firstname:
   <input type="text" class="form-control" formControlName="firstname" /> Age:
-  <input type="text" class="form-control" formControlName="age" /> Cin:
+  <input type="text" class="form-control" formControlName="age" />
+  Cin:
   <input type="text" class="form-control" formControlName="cin" />
   <div
     *ngIf="
@@ -20,6 +21,37 @@
   >
     Cette Cin est invalide
   </div>
+
+  <div *ngIf="cin.touched && cin.invalid" class="alert alert-danger">
+    <div *ngIf="cin.errors?.['required']">Le CIN est obligatoire</div>
+    <div *ngIf="cin.errors?.['pattern']">
+      Le CIN doit contenir exactement 8 chiffres
+    </div>
+  </div>
+
+  <div *ngIf="cin.pending" class="alert alert-info">
+    Vérification de l'unicité du CIN...
+  </div>
+  <div *ngIf="cin.errors?.['cinExists']" class="alert alert-danger">
+    Ce CIN est déjà utilisé
+  </div>
+
+  <div
+    *ngIf="form.errors?.['cinAgeInconsistent'] && (cin.touched || age.touched)"
+    class="alert alert-danger"
+  >
+    Incohérence entre l'âge ({{ form.value.age }} ans) et le CIN.<br />
+    <strong>
+      <ng-container *ngIf="form.value.age >= 60">
+        Pour une personne de 60 ans ou plus, le CIN doit commencer par 00 à 19.
+      </ng-container>
+      <ng-container *ngIf="form.value.age < 60">
+        Pour une personne de moins de 60 ans, le CIN doit commencer par 20 ou
+        plus.
+      </ng-container>
+    </strong>
+  </div>
+
   Job: <input type="text" class="form-control" formControlName="job" /> Path:
   <input type="text" class="form-control" formControlName="path" />
 

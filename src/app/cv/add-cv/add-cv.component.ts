@@ -1,38 +1,40 @@
-import { Component } from "@angular/core";
-import {
-  AbstractControl,
-  FormBuilder,
-  Validators,
-} from "@angular/forms";
-import { CvService } from "../services/cv.service";
-import { Router } from "@angular/router";
-import { ToastrService } from "ngx-toastr";
-import { APP_ROUTES } from "src/config/routes.config";
-import { Cv } from "../model/cv";
+import { Component } from '@angular/core';
+import { AbstractControl, FormBuilder, Validators } from '@angular/forms';
+import { CvService } from '../services/cv.service';
+import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { APP_ROUTES } from 'src/config/routes.config';
+import { Cv } from '../model/cv';
+import { UniqueCinValidator } from '../../validators/unique-cin.validator';
+import { cinAgeValidator } from 'src/app/validators/cin-age.validator';
 
 @Component({
-  selector: "app-add-cv",
-  templateUrl: "./add-cv.component.html",
-  styleUrls: ["./add-cv.component.css"],
+  selector: 'app-add-cv',
+  templateUrl: './add-cv.component.html',
+  styleUrls: ['./add-cv.component.css'],
 })
 export class AddCvComponent {
   constructor(
     private cvService: CvService,
     private router: Router,
     private toastr: ToastrService,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private uniqueCinValidator: UniqueCinValidator
   ) {}
 
   form = this.formBuilder.group(
     {
-      name: ["", Validators.required],
-      firstname: ["", Validators.required],
-      path: [""],
-      job: ["", Validators.required],
+      name: ['', Validators.required],
+      firstname: ['', Validators.required],
+      path: [''],
+      job: ['', Validators.required],
       cin: [
-        "",
+        '',
         {
-          validators: [Validators.required, Validators.pattern("[0-9]{8}")],
+          validators: [Validators.required, Validators.pattern('[0-9]{8}')],
+          asyncValidators: [
+            this.uniqueCinValidator.validate.bind(this.uniqueCinValidator),
+          ],
         },
       ],
       age: [
@@ -42,6 +44,7 @@ export class AddCvComponent {
         },
       ],
     },
+    { validators: cinAgeValidator() }
   );
 
   addCv() {
@@ -59,21 +62,21 @@ export class AddCvComponent {
   }
 
   get name(): AbstractControl {
-    return this.form.get("name")!;
+    return this.form.get('name')!;
   }
   get firstname() {
-    return this.form.get("firstname");
+    return this.form.get('firstname');
   }
   get age(): AbstractControl {
-    return this.form.get("age")!;
+    return this.form.get('age')!;
   }
   get job() {
-    return this.form.get("job");
+    return this.form.get('job');
   }
   get path() {
-    return this.form.get("path");
+    return this.form.get('path');
   }
   get cin(): AbstractControl {
-    return this.form.get("cin")!;
+    return this.form.get('cin')!;
   }
 }
