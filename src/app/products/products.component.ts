@@ -19,36 +19,50 @@ import { Settings } from "./dto/product-settings.dto";
   styleUrls: ["./products.component.css"],
 })
 export class ProductsComponent {
-  /* Flux déclaratif pour charger les produits page par page (12 par page) */
   products$!: Observable<Product[]>;
   hasMore$!: Observable<boolean>;
+
+  /** Signal déclencheur pour charger 12 produits de plus */
   private loadMore$ = new Subject<void>();
 
   constructor(private productService: ProductService) {
+
+    /** Flux de pagination */
     const page$ = this.loadMore$.pipe(
-      startWith(null),
-      // first emission -> page 0, then increment
+      startWith(null), // déclenche le premier chargement
       scan((page) => (page === null ? 0 : (page as number) + 1), null as number | null),
       map((p) => p as number)
     );
 
-    const acc$ = page$.pipe(
+    /** Flux d’accumulation des produits */
+    const response$ = page$.pipe(
       concatMap((page) =>
-        this.productService.getProducts({ limit: 12, skip: page * 12 } as Settings)
+        this.productService.getProducts({
+          limit: 12,
+          skip: page * 12,
+        } as Settings)
       ),
       scan(
-        (acc, res) => ({ products: [...acc.products, ...res.products], total: res.total }),
+        (acc, res) => ({
+          products: [...acc.products, ...res.products],
+          total: res.total,
+        }),
         { products: [] as Product[], total: 0 }
       ),
-      // complete when we've loaded all products; include the final emission
-      takeWhile((acc) => acc.products.length < acc.total, true),
-      shareReplay({ bufferSize: 1, refCount: true })
+      /** Partage du résultat entre products$ et hasMore$ */
+      shareReplay(1)
     );
 
-    this.products$ = acc$.pipe(map((acc) => acc.products));
-    this.hasMore$ = acc$.pipe(map((acc) => acc.products.length < acc.total));
+    /** Liste accumulée des produits */
+    this.products$ = response$.pipe(map((r) => r.products));
+
+    /** Condition pour afficher ou non le bouton "charger plus" */
+    this.hasMore$ = response$.pipe(
+      map((r) => r.products.length < r.total)
+    );
   }
 
+  /** Déclenche le chargement de 12 produits */
   loadMore() {
     this.loadMore$.next();
   }
