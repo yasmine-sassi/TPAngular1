@@ -1,66 +1,68 @@
-import { Component } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import {
-  Observable,
-  Subject,
-  startWith,
-  scan,
-  map,
-  concatMap,
-  takeWhile,
-  shareReplay,
-} from "rxjs";
-import { Product } from "./dto/product.dto";
-import { ProductService } from "./services/product.service";
-import { Settings } from "./dto/product-settings.dto";
+import { Component, signal, computed, effect } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { firstValueFrom } from 'rxjs';
+import { ProductService } from './services/product.service';
+import { Product } from './dto/product.dto';
+import { Settings } from './dto/product-settings.dto';
 
 @Component({
-  selector: "app-products",
-  templateUrl: "./products.component.html",
-  styleUrls: ["./products.component.css"],
+  selector: 'app-products',
+  templateUrl: './products.component.html',
+  styleUrls: ['./products.component.css'],
   standalone: true,
   imports: [CommonModule],
 })
 export class ProductsComponent {
-  products$!: Observable<Product[]>;
-  hasMore$!: Observable<boolean>;
-  // compatibility properties for templates expecting signal-style API
-  products: any;
-  hasMore: any;
 
-  private loadMore$ = new Subject<void>();
+  private page = signal(0);
+  private productsAcc = signal<Product[]>([]);
+  private total = signal(0);
+
+  loading = signal(false);
+  error = signal<string | null>(null);
+
+  readonly limit = 12;
 
   constructor(private productService: ProductService) {
-    const page$ = this.loadMore$.pipe(
-      startWith(null),
-      // first emission => 0, then increment
-      scan((page) => (page === null ? 0 : (page as number) + 1), null as number | null),
-      map((p) => p as number)
-    );
 
-    const acc$ = page$.pipe(
-      concatMap((page) =>
-        this.productService.getProducts({ limit: 12, skip: page * 12 } as Settings)
-      ),
-      scan(
-        (acc, res) => ({ products: [...acc.products, ...res.products], total: res.total }),
-        { products: [] as Product[], total: 0 }
-      ),
-      // complete after we've loaded all products; include final emission
-      takeWhile((acc) => acc.products.length < acc.total, true),
-      shareReplay({ bufferSize: 1, refCount: true })
-    );
+    effect(async () => {
+      const currentPage = this.page();
 
-    this.products$ = acc$.pipe(map((acc) => acc.products));
-    this.hasMore$ = acc$.pipe(map((acc) => acc.products.length < acc.total));
+      this.loading.set(true);
+      this.error.set(null);
 
-    // compatibility: expose properties that may be used by templates
-    // templates should prefer `products$ | async` and `hasMore$ | async`.
-    this.products = undefined;
-    this.hasMore = undefined;
+      try {
+        const res = await firstValueFrom(
+          this.productService.getProducts({
+            limit: this.limit,
+            skip: currentPage * this.limit,
+          } as Settings)
+        );
+
+        console.log('[Products] fetched page', currentPage, 'items', res?.products?.length, 'total', res?.total);
+
+        if (!res) return;
+
+        this.productsAcc.update(prev => [...prev, ...res.products]);
+        this.total.set(res.total);
+
+      } catch (e: any) {
+        console.error('[Products] fetch error', e);
+        this.error.set(e?.message ?? 'Error fetching products');
+
+      } finally {
+        this.loading.set(false);
+      }
+    }, { allowSignalWrites: true });
+
+    // Load page 0 immediately
+    this.page.set(0);
   }
 
+  products = computed(() => this.productsAcc());
+  hasMore = computed(() => this.productsAcc().length < this.total());
+
   loadMore() {
-    this.loadMore$.next();
+    this.page.update(p => p + 1);
   }
 }
