@@ -15,16 +15,16 @@ import { RhComponent } from "./optimizationPattern/rh/rh.component";
 import { ProductsComponent } from "./products/products.component";
 
 const routes: Route[] = [
-  { path: "login", component: LoginComponent },
-  { path: "rh", component: RhComponent },
+  { path: 'login', component: LoginComponent },
+  { path: 'rh', component: RhComponent },
   {
-    path: "cv",
+    path: 'cv',
     component: CvComponent,
   },
-  { path: "cv/add", component: AddCvComponent, canActivate: [AuthGuard] },
-  { path: "cv/:id", component: DetailsCvComponent },
+  { path: 'cv/add', component: AddCvComponent, canActivate: [AuthGuard] },
+  { path: 'cv/:id', component: DetailsCvComponent },
   {
-    path: "",
+    path: '',
     component: FrontComponent,
     children: [
       { path: "todo", component: TodoComponent },
@@ -33,11 +33,11 @@ const routes: Route[] = [
     ],
   },
   {
-    path: "admin",
+    path: 'admin',
     component: AdminComponent,
-    children: [{ path: "color", component: ColorComponent }],
+    children: [{ path: 'color', component: ColorComponent }],
   },
-  { path: "**", component: NF404Component },
+  { path: '**', component: NF404Component },
 ];
 
 @NgModule({

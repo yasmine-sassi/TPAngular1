@@ -25,12 +25,11 @@ export class LoginComponent {
   constructor() {}
   login(credentials: CredentialsDto) {
     this.authService.login(credentials).subscribe({
-      next: (response) => {
-        localStorage.setItem('token', response.id);
+      next: () => {
         this.toastr.success(`Bienvenu chez vous :)`);
         this.router.navigate([APP_ROUTES.cv]);
       },
-      error: (error) => {
+      error: () => {
         this.toastr.error('Veuillez vérifier vos credentials');
       },
     });

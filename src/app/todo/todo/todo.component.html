@@ -1,18 +1,140 @@
-<div class="row">
-  <div class="col">
-    <ol class="list-group">
-      @for (todo of todos; track todo) {
-        <li class="list-group-item">
-          {{todo.name}} : {{todo.content}}
-          <i (click)="deleteTodo(todo)" class="fa fa-trash" aria-hidden="true"></i>
-        </li>
-      }
-    </ol>
-  </div>
-  <div class="col">
-    name: <input [(ngModel)]="todo.name" type="text" class="form-control">
-    content: <input [(ngModel)]="todo.content" type="text" class="form-control">
-    <button (click)="addTodo()" [disabled]="!todo.name.trim() || !todo.content.trim()"
-    class="btn btn-primary m-2">add</button>
+<div class="container">
+  <div class="row">
+    <!-- Formulaire d'ajout -->
+    <div class="col-12 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <h5>Add your Todo</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4">
+              <label class="form-label">Name:</label>
+              <input 
+                [(ngModel)]="todo().name" 
+                type="text" 
+                class="form-control"
+                placeholder="Name of the Todo">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Content:</label>
+              <input 
+                [(ngModel)]="todo().content" 
+                type="text" 
+                class="form-control"
+                placeholder="Description of the Todo">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              <button 
+                (click)="addTodo()" 
+                [disabled]="!todo().name.trim() || !todo().content.trim()"
+                class="btn btn-primary w-100">
+                Add
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Liste des todos par statut -->
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header bg-warning text-dark">
+          <h6>Waiting</h6>
+        </div>
+        <div class="card-body">
+          @for (todo of getWaitingTodos(); track todo.id) {
+            <div class="card mb-2">
+              <div class="card-body">
+                <h6 class="card-title">{{ todo.name }}</h6>
+                <p class="card-text">{{ todo.content }}</p>
+                <div class="d-flex justify-content-between">
+                  <button 
+                    (click)="updateTodoStatus(todo, 'in progress')"
+                    class="btn btn-sm btn-outline-primary">
+                    → In Progress
+                  </button>
+                  <button 
+                    (click)="deleteTodo(todo)"
+                    class="btn btn-sm btn-outline-danger">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+          @empty {
+            <p class="text-muted">Any waiting Todo </p>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header bg-info text-white">
+          <h6>In Progress Todos</h6>
+        </div>
+        <div class="card-body">
+          @for (todo of getInProgressTodos(); track todo.id) {
+            <div class="card mb-2">
+              <div class="card-body">
+                <h6 class="card-title">{{ todo.name }}</h6>
+                <p class="card-text">{{ todo.content }}</p>
+                <div class="d-flex justify-content-between">
+                  <button 
+                    (click)="updateTodoStatus(todo, 'waiting')"
+                    class="btn btn-sm btn-outline-secondary">
+                    ← Waiting
+                  </button>
+                  <button 
+                    (click)="updateTodoStatus(todo, 'done')"
+                    class="btn btn-sm btn-outline-success">
+                    → Done
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+          @empty {
+            <p class="text-muted">Any In Progress Todo</p>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header bg-success text-white">
+          <h6>Done Todos</h6>
+        </div>
+        <div class="card-body">
+          @for (todo of getDoneTodos(); track todo.id) {
+            <div class="card mb-2">
+              <div class="card-body">
+                <h6 class="card-title">{{ todo.name }}</h6>
+                <p class="card-text">{{ todo.content }}</p>
+                <div class="d-flex justify-content-between">
+                  <button 
+                    (click)="updateTodoStatus(todo, 'in progress')"
+                    class="btn btn-sm btn-outline-info">
+                    ← In Progress
+                  </button>
+                  <button 
+                    (click)="deleteTodo(todo)"
+                    class="btn btn-sm btn-outline-danger">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+          @empty {
+            <p class="text-muted">Any done Todo</p>
+          }
+        </div>
+      </div>
+    </div>
   </div>
 </div>
