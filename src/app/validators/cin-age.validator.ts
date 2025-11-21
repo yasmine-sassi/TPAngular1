@@ -13,8 +13,8 @@ export function cinAgeValidator(): ValidatorFn {
     const cin = control.get('cin')?.value?.toString().trim();
     const age = control.get('age')?.value;
 
-    if (!cin || age === null || age === undefined || !/^\d{8}$/.test(cin)) {
-      return null; // autres validateurs gèrent ça
+    if (age === null || age === undefined || !/^\d{8}$/.test(cin)) {
+      return null;
     }
 
     const firstTwo = parseInt(cin.slice(0, 2), 10);
