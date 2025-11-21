@@ -3,10 +3,9 @@ import { Cv } from '../model/cv';
 import { CvService } from '../services/cv.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { APP_ROUTES } from '../../../config/routes.config';
 import { AuthService } from '../../auth/services/auth.service';
 import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-details-cv',
@@ -14,8 +13,7 @@ import { catchError } from 'rxjs/operators';
   styleUrls: ['./details-cv.component.css'],
 })
 export class DetailsCvComponent implements OnInit {
-  cv$: Observable<Cv | null>; // 🔹 observable CV
-  id: number;
+  cv$: Observable<Cv | null>;
 
   constructor(
     private cvService: CvService,
@@ -24,16 +22,19 @@ export class DetailsCvComponent implements OnInit {
     private toastr: ToastrService,
     public authService: AuthService
   ) {
-    this.id = +this.activatedRoute.snapshot.params['id'];
-    this.cv$ = of(null); // initialize
+    this.cv$ = of(null);
   }
 
   ngOnInit() {
-    this.cv$ = this.cvService.getCvById(this.id).pipe(
-      catchError((error) => {
-        this.toastr.error('Problème avec le serveur. Redirection vers la liste.');
-        this.router.navigate([APP_ROUTES.cv]);
-        return of(null); // fallback to null
+    this.cv$ = this.activatedRoute.params.pipe(
+      switchMap(params => {
+        const id = +params['id'];
+        return this.cvService.getCvById(id).pipe(
+          catchError((error) => {
+            this.toastr.error('CV non trouvé.');
+            return of(null);
+          })
+        );
       })
     );
   }
@@ -42,12 +43,11 @@ export class DetailsCvComponent implements OnInit {
     this.cvService.deleteCvById(cv.id).subscribe({
       next: () => {
         this.toastr.success(`${cv.name} supprimé avec succès`);
-        this.router.navigate([APP_ROUTES.cv]);
+        // Navigate back to just the list (remove the ID from URL)
+        this.router.navigate(['/cv']);
       },
       error: () => {
-        this.toastr.error(
-          `Problème avec le serveur veuillez contacter l'admin`
-        );
+        this.toastr.error(`Problème avec le serveur veuillez contacter l'admin`);
       },
     });
   }

@@ -5,6 +5,7 @@ import { ToastrService } from "ngx-toastr";
 import { CvService } from "../services/cv.service";
 import { Observable, of } from "rxjs";
 import { catchError } from "rxjs/operators";
+import { Router } from '@angular/router';
 
 @Component({
   selector: "app-cv",
@@ -13,34 +14,30 @@ import { catchError } from "rxjs/operators";
 })
 export class CvComponent {
   cvs$: Observable<Cv[]>;            
-  selectedCv$: Observable<Cv | null>; 
   date = new Date();
 
   constructor(
     private logger: LoggerService,
     private toastr: ToastrService,
-    private cvService: CvService
+    private cvService: CvService,
+    private router: Router
   ) {
-    // Use async pipe in template instead of subscribe
     this.cvs$ = this.cvService.getCvs().pipe(
       catchError((error) => {
         this.toastr.error(`
           Attention !! Les données sont fictives, problème avec le serveur.
           Veuillez contacter l'admin.
         `);
-        return of(this.cvService.getFakeCvs()); // fallback data
+        return of(this.cvService.getFakeCvs());
       })
     );
 
-    this.selectedCv$ = this.cvService.selectCv$;
-
-    // Logs / info
     this.logger.logger("je suis le cvComponent");
     this.toastr.info("Bienvenu dans notre CvTech");
   }
 
-  // Called when a CV is selected from ListComponent
+  // Navigate to detail view - this will update the child route
   selectCv(cv: Cv) {
-    this.cvService.selectCv(cv);
+    this.router.navigate(['/cv', cv.id]);
   }
 }

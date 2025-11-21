@@ -1,7 +1,8 @@
-<div class="d-flex justify-content-center" *ngIf="cv$ | async as cv">
+<div class="d-flex justify-content-center" *ngIf="cv$ | async as cv; else loading">
   <div class="col-lg-8 push-lg-4">
     <div class="tab-content p-b-3">
       <div class="tab-pane active" id="profile">
+        <!-- No back button - user can click another CV in the list -->
         <h4 class="m-y-2">Cv {{ cv.firstname }} {{ cv.name }}</h4>
         <div class="d-flex justify-content-center">
           <img width="150px" height="150px" class="rounded-circle align-content-center"
@@ -35,3 +36,11 @@
     </div>
   </div>
 </div>
+
+<ng-template #loading>
+  <div class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+  </div>
+</ng-template>
