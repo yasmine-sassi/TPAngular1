@@ -1,14 +1,13 @@
 <div class="master-detail-container">
   <!-- Master Panel - Always shows the CV list -->
   <div class="master-panel">
-    <app-cv></app-cv> <!-- This will always be visible -->
+    <app-cv></app-cv>
+    <!-- This will always be visible -->
   </div>
-  
+
   <!-- Detail Panel - Shows details via router outlet -->
   <div class="detail-panel">
-    <router-outlet></router-outlet> <!-- DetailsCvComponent appears here when route has ID -->
-    
-    <!-- Show message when no CV is selected -->
-    
+    <router-outlet></router-outlet>
+    <!-- DetailsCvComponent appears here when route has ID -->
   </div>
 </div>
