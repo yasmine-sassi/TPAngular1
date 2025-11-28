@@ -1,9 +1,34 @@
+<!-- AUTOCOMPLETE POUR FILTRER LA LISTE PRINCIPALE -->
+<div class="container mt-3">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h4>🔍 Rechercher un CV</h4>
+      <app-autocomplete 
+        (searchTermChanged)="onSearchTermChanged($event)"
+        (cvSelected)="onCvSelected($event)">
+      </app-autocomplete>
+    </div>
+  </div>
+</div>
+
+<!-- UTILISEZ filteredCvs() AU LIEU DE cvs -->
 <div class="row">
   <div class="col">
     <div class="alert alert-warning">
       {{ date | date : "full" | uppercase }}
+      
+      <!-- AFFICHER LE NOMBRE DE RÉSULTATS FILTRÉS -->
+      @if (searchTerm() && searchTerm().length >= 2) {
+        <div class="mt-2">
+          <small>
+            {{ filteredCvs().length }} CV(s) trouvé(s) pour "{{ searchTerm() }}"
+          </small>
+        </div>
+      }
     </div>
-    <app-list [cvs]="cvs"></app-list>
+    
+    <!-- LISTE PRINCIPALE FILTRÉE -->
+    <app-list [cvs]="filteredCvs()"></app-list>
   </div>
   <div class="col">
     <app-cv-card [cv]="selectedCv"></app-cv-card>

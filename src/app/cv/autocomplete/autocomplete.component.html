@@ -1,3 +1,11 @@
-<form [formGroup]="form">
-  <input type="text" class="form-control" formControlName="search" />
-</form>
+<div class="autocomplete-container">
+  <div class="search-box">
+    <input 
+      type="text" 
+      [formControl]="search"
+      placeholder="Rechercher un CV par nom..."
+      class="form-control"
+      autocomplete="off"
+    >
+  </div>
+</div>
