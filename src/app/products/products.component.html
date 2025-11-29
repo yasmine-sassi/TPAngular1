@@ -1,29 +1,25 @@
-<ng-container *ngIf="products().length > 0; else loadingTpl">
-  <div class="mb-3">
-    <button class="btn btn-primary"
-            (click)="loadMore()"
-            [disabled]="!hasMore()">
-      More Products
-    </button>
-  </div>
+@if (products(); as productsList) {
+
+  <button class="btn btn-primary" (click)="loadMore()">More Products</button>
 
   <div class="alert alert-warning">
-    Product Number: {{ products().length }}
+    Product Number: {{ productsList.length }}
   </div>
 
   <div class="row">
-    <div class="col-4" *ngFor="let product of products()">
-      <img class="rounded-circle"
-           [src]="product.thumbnail"
-           width="150"
-           height="150"
-           alt="">
-
-      {{ product.title }}
-    </div>
+    @for (product of productsList; track product) {
+      <div class="col-4">
+        <img
+          class="rounded-circle"
+          [src]="product.thumbnail"
+          width="150"
+          height="150"
+        />
+        {{ product.title }}
+      </div>
+    }
   </div>
-</ng-container>
-<ng-template #loadingTpl>
-  <div *ngIf="loading()">Loading...</div>
-  <div *ngIf="error()">Error: {{ error() }}</div>
-</ng-template>
+
+} @else {
+  Loading...
+}
