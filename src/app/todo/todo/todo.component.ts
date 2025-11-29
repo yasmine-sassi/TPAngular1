@@ -4,11 +4,10 @@ import { TodoService } from '../service/todo.service';
 import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-todo',
-  templateUrl: './todo.component.html',
-  styleUrls: ['./todo.component.css'],
-  standalone: true,
-  imports: [FormsModule],
+    selector: 'app-todo',
+    templateUrl: './todo.component.html',
+    styleUrls: ['./todo.component.css'],
+    imports: [FormsModule]
 })
 export class TodoComponent {
   private todoService = inject(TodoService);

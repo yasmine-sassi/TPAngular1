@@ -2,11 +2,10 @@ import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-ttc',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './ttc.component.html',
-  styleUrls: ['./ttc.component.css'],
+    selector: 'app-ttc',
+    imports: [CommonModule],
+    templateUrl: './ttc.component.html',
+    styleUrls: ['./ttc.component.css']
 })
 export class TtcComponent {
   price = signal(0);

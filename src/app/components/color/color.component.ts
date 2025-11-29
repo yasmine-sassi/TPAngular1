@@ -3,11 +3,10 @@ import { signal } from '@angular/core';  // Import signal for reactive state man
 import { RainbowWritingDirective } from '../../rainbow-writing.directive';  // Import the directive
 
 @Component({
-  selector: "app-color",
-  standalone: true,  // This makes the component standalone
-  imports: [RainbowWritingDirective],  // Import the directive here
-  templateUrl: "./color.component.html",
-  styleUrls: ["./color.component.css"],
+    selector: "app-color", // This makes the component standalone
+    imports: [RainbowWritingDirective], // Import the directive here
+    templateUrl: "./color.component.html",
+    styleUrls: ["./color.component.css"]
 })
 export class ColorComponent implements OnInit {
   @Input() defaultColor = "red";
