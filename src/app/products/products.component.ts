@@ -1,68 +1,47 @@
-import { Component, signal, computed, effect } from '@angular/core';
+import { Component, signal, resource } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { firstValueFrom } from 'rxjs';
 import { ProductService } from './services/product.service';
-import { Product } from './dto/product.dto';
-import { Settings } from './dto/product-settings.dto';
 
 @Component({
   selector: 'app-products',
-  templateUrl: './products.component.html',
-  styleUrls: ['./products.component.css'],
   standalone: true,
   imports: [CommonModule],
+  templateUrl: './products.component.html',
 })
 export class ProductsComponent {
 
-  private page = signal(0);
-  private productsAcc = signal<Product[]>([]);
-  private total = signal(0);
+  limit = 12;
+  page = signal(0);
 
-  loading = signal(false);
-  error = signal<string | null>(null);
+  productsResource = resource({
+    request: () => this.page(),
+    loader: async ({ request: page, abortSignal }) => {
+      const res = await fetch(
+        `https://dummyjson.com/products?limit=${this.limit}&skip=${page * this.limit}`,
+        { signal: abortSignal }
+      ).then(r => r.json());
 
-  readonly limit = 12;
+      return res; // contient { products, total }
+    }
+  });
 
-  constructor(private productService: ProductService) {
+  // Accumule automatiquement toutes les pages déjà chargées
+  allProducts = signal([] as any[]);
 
-    effect(async () => {
-      const currentPage = this.page();
-
-      this.loading.set(true);
-      this.error.set(null);
-
-      try {
-        const res = await firstValueFrom(
-          this.productService.getProducts({
-            limit: this.limit,
-            skip: currentPage * this.limit,
-          } as Settings)
-        );
-
-        console.log('[Products] fetched page', currentPage, 'items', res?.products?.length, 'total', res?.total);
-
-        if (!res) return;
-
-        this.productsAcc.update(prev => [...prev, ...res.products]);
-        this.total.set(res.total);
-
-      } catch (e: any) {
-        console.error('[Products] fetch error', e);
-        this.error.set(e?.message ?? 'Error fetching products');
-
-      } finally {
-        this.loading.set(false);
+  constructor() {
+    this.productsResource.valueChanges().subscribe(res => {
+      if (res?.products) {
+        this.allProducts.update(list => [...list, ...res.products]);
       }
-    }, { allowSignalWrites: true });
-
-    // Load page 0 immediately
-    this.page.set(0);
+    });
   }
 
-  products = computed(() => this.productsAcc());
-  hasMore = computed(() => this.productsAcc().length < this.total());
+  get hasMore() {
+    const r = this.productsResource.value();
+    return !r ? true : this.allProducts().length < r.total;
+  }
 
   loadMore() {
-    this.page.update(p => p + 1);
+    if (this.hasMore) this.page.update(p => p + 1);
   }
 }
