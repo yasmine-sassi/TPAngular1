@@ -12,16 +12,20 @@ import { AddCvComponent } from "./cv/add-cv/add-cv.component";
 import { CvComponent } from "./cv/cv/cv.component";
 import { DetailsCvComponent } from "./cv/details-cv/details-cv.component";
 import { RhComponent } from "./optimizationPattern/rh/rh.component";
+import { MasterDetailsComponent } from "./cv/master-details/master-details.component"; // Add this import
 
 const routes: Route[] = [
   { path: "login", component: LoginComponent },
   { path: "rh", component: RhComponent },
   {
     path: "cv",
-    component: CvComponent,
+    component: MasterDetailsComponent, // Replace CvComponent with master-detail
   },
   { path: "cv/add", component: AddCvComponent, canActivate: [AuthGuard] },
-  { path: "cv/:id", component: DetailsCvComponent },
+  { 
+    path: "cv/:id", 
+    component: MasterDetailsComponent, // Use master-detail for detail view too
+  },
   {
     path: "",
     component: FrontComponent,

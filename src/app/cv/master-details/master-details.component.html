@@ -1,0 +1,32 @@
+<!-- master-details.component.html -->
+<div class="master-detail-container">
+  <div class="master-panel">
+    <div class="list-header">
+      <h2>Liste des CVs</h2>
+      @if (loading()) {
+        <span class="loading">Chargement...</span>
+      }
+    </div>
+    
+    @if (!loading()) {
+      <app-list 
+        [cvs]="cvs()"
+        [selectedCvId]="selectedCvId()"
+        (selectCv)="selectCv($event)"
+      ></app-list>
+    }
+  </div>
+
+  <div class="detail-panel">
+    @if (selectedCvId() && selectedCv()) {
+      <app-details-cv></app-details-cv>
+    } @else if (selectedCvId() && !selectedCv()) {
+      <div class="loading">Chargement du CV...</div>
+    } @else {
+      <div class="no-selection">
+        <h3>Sélectionnez un CV</h3>
+        <p>Choisissez un CV dans la liste pour voir les détails</p>
+      </div>
+    }
+  </div>
+</div>

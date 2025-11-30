@@ -1,14 +1,14 @@
-<ol class="list-group">
-  @for (cv of cvs; track cv; let isOdd = $odd) {
-    <li
-    [ngClass]="{
-      'list-group-item-primary': isOdd,
-      'list-group-item-secondary': !isOdd
-    }"
-      class="list-group-item"
-      >
-      <!--     (selectCv)="forwardCv.emit(cv)"-->
+<!-- list.component.html -->
+<div class="cv-list">
+  @for (cv of cvs(); track cv.id) {
+    <div 
+      class="cv-item" 
+      [class.selected]="selectedCvId() === cv.id"
+      (click)="onCvSelect(cv)"
+    >
       <app-item [cv]="cv"></app-item>
-    </li>
+    </div>
+  } @empty {
+    <div class="empty-list">Aucun CV trouvé</div>
   }
-</ol>
+</div>

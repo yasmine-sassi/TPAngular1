@@ -1,12 +1,16 @@
 <div class="row">
   <div class="col">
     <div class="alert alert-warning">
-      {{ date | date : "full" | uppercase }}
+      {{ date() | date : "full" | uppercase }}
     </div>
-    <app-list [cvs]="cvs"></app-list>
+    <app-list [cvs]="cvs()"></app-list>
   </div>
   <div class="col">
-    <app-cv-card [cv]="selectedCv"></app-cv-card>
+    @if (selectedCv(); as cv) {
+      <app-cv-card [cv]="cv"></app-cv-card>
+    } @else {
+      <app-cv-card [cv]="null"></app-cv-card>
+    }
   </div>
 </div>
 <app-embauche></app-embauche>
