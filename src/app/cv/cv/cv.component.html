@@ -13,13 +13,5 @@
 @defer (on interaction) {
   <app-embauche></app-embauche>
 } @placeholder {
-  <div class="text-center p-3">
-    <p class="text-muted">Chargement du composant embauche...</p>
-  </div>
-} @loading (minimum 30s) {
-  <div class="text-center p-3">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Chargement...</span>
-    </div>
-  </div>
+  <p>Chargement...</p>
 }
