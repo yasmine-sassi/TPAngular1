@@ -1,12 +1,13 @@
-import { Component, inject , signal} from "@angular/core";
+import { Component, inject, signal } from "@angular/core";
 import { Cv } from "../model/cv";
 import { LoggerService } from "../../services/logger.service";
 import { ToastrService } from "ngx-toastr";
 import { CvService } from "../services/cv.service";
 import { ListComponent } from "../list/list.component";
 import { CvCardComponent } from "../cv-card/cv-card.component";
-import { EmbaucheComponent } from "../embauche/embauche.component";
+import { EmbaucheComponent } from "../embauche/embauche.component"; 
 import { UpperCasePipe, DatePipe } from "@angular/common";
+
 @Component({
     selector: "app-cv",
     templateUrl: "./cv.component.html",
@@ -26,11 +27,7 @@ export class CvComponent {
 
   cvs = signal<Cv[]>([]);
   selectedCv = this.cvService.selectedCv;
-  /*   selectedCv: Cv | null = null; */
   date = new Date();
-
-  /** Inserted by Angular inject() migration for backwards compatibility */
-  constructor(...args: unknown[]);
 
   constructor() {
     this.cvService.getCvs().subscribe({

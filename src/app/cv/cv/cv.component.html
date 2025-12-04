@@ -9,4 +9,9 @@
     <app-cv-card [cv]="selectedCv()"></app-cv-card>
   </div>
 </div>
-<app-embauche></app-embauche>
+
+@defer (on interaction) {
+  <app-embauche></app-embauche>
+} @placeholder {
+  <p>Chargement...</p>
+}
